@@ -11,7 +11,19 @@
 <meta name="theme-color" content="#05060a" />
 <meta name="apple-itunes-app" content="app-id=6789639784" />
 <meta name="robots" content="noindex,nofollow" />
-<title>KAMO — spot the hidden one</title>
+<title>KAMO — Meccha IRL</title>
+<!-- Link previews. Every challenge goes out as a bare URL in WhatsApp/iMessage, and with no
+     og:* here the scrapers fell back to <title> plus the raw host. Pin the name so the
+     preview reads the same wherever the link lands. og:image must be absolute — the mirror
+     carries the same block against its own origin. -->
+<meta property="og:title" content="KAMO — Meccha IRL" />
+<meta property="og:site_name" content="KAMO" />
+<meta property="og:description" content="There's a body hidden in this photo. Find it." />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="https://kamo.bliss-coach.com/icon.png" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="KAMO — Meccha IRL" />
+<meta name="twitter:description" content="There's a body hidden in this photo. Find it." />
 <style>
   :root{
     --bg:#05060a; --panel:rgba(16,16,24,.72); --stroke:rgba(255,255,255,.14);
@@ -880,6 +892,75 @@
      clock and the same mask-composite trick as .pwPlan.active — the sheet already teaches
      that a shimmering mint edge means "this is the one", so reusing it costs no new
      vocabulary. border-color goes transparent because the ::before IS the edge now. */
+  /* The preview and the settings share one shell: same backdrop, same card, same rise as
+     the paywall, because they are the same class of object — a sheet that interrupts the
+     share sheet and must hand it back. */
+  .chPP{position:fixed;inset:0;z-index:90;display:flex;align-items:flex-end;justify-content:center;
+    background:rgba(3,5,8,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+  .chPPin{width:100%;max-width:460px;display:flex;flex-direction:column;gap:10px;
+    padding:20px 20px calc(16px + var(--safe-b));border-top-left-radius:26px;border-top-right-radius:26px;
+    border:1px solid rgba(255,255,255,.2);border-bottom:none;
+    background:linear-gradient(180deg,#14382d,#0f2a22 55%,#0c1f19);animation:pwUp .3s cubic-bezier(.2,.9,.3,1);}
+  .chPPh{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:-.3px;color:#fff;}
+  .chPPframe{position:relative;flex:0 1 auto;min-height:0;border-radius:14px;overflow:hidden;
+    border:1px solid rgba(255,255,255,.14);background:#080c0a;display:flex;justify-content:center;}
+  .chPPframe canvas{max-width:100%;max-height:44vh;display:block;cursor:pointer;}
+  .chPPbar{height:4px;border-radius:999px;background:rgba(255,255,255,.12);overflow:hidden;}
+  .chPPbar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#8ef0bd);
+    transition:width 1s linear;}
+  .chPPmeta{display:flex;justify-content:space-between;font-size:13px;font-weight:800;
+    color:rgba(255,255,255,.78);letter-spacing:.06em;}
+  .chPPfoot{display:flex;flex-direction:column;gap:8px;}
+  .chPPsub{font-size:12.5px;color:rgba(255,255,255,.58);line-height:1.45;}
+  .chPPclose{background:none;border:none;color:rgba(255,255,255,.45);font-size:14px;font-weight:700;
+    padding:8px;cursor:pointer;font-family:var(--font);}
+  @keyframes chPPshake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}
+    30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
+  .chPPshake{animation:chPPshake .5s cubic-bezier(.36,.07,.19,.97) both;}
+  .chSetRow{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:11px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14.5px;color:#fff;}
+  .chSetCtl{display:flex;align-items:center;gap:12px;}
+  .chSetCtl button{width:34px;height:34px;border-radius:11px;border:1px solid var(--stroke);
+    background:rgba(255,255,255,.07);color:#fff;font-size:19px;font-weight:700;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;font-family:var(--font);}
+  .chSetCtl b{min-width:34px;text-align:center;font-size:16px;font-weight:800;color:var(--mint);}
+  /* ===== chPreview — the card that shows what the recipient receives =====================
+     PERMANENT, where this used to be a 4.2s toast. A strip that deletes itself cannot carry
+     a settings control or a tap target, and the sender's most common question at this exact
+     moment ("what are they actually getting?") does not have a 4-second shelf life.
+     TWO TARGETS, ONE GESTURE EACH. The thumbnail opens the preview; the gear opens the
+     settings. Neither overlaps: the gear stops propagation, so a thumb landing on it never
+     also launches the preview. */
+  .chPrev{display:none;align-items:center;gap:11px;width:100%;margin:-2px 0 9px;padding:10px 11px;
+    background:rgba(255,255,255,.05);border:1px solid var(--stroke);border-radius:16px;text-align:left;}
+  .chPrev.on{display:flex;}
+  .chPrevShot{flex:0 0 auto;width:46px;height:60px;border-radius:10px;overflow:hidden;position:relative;
+    border:1px solid rgba(255,255,255,.18);background:#0a0f0d;padding:0;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;transition:transform .12s cubic-bezier(.3,1.5,.5,1);}
+  .chPrevShot:active{transform:scale(.94);}
+  .chPrevShot canvas{max-width:100%;max-height:100%;display:block;}
+  /* A play glyph, so the thumbnail reads as something you can open rather than as decoration.
+     Small and low-contrast on purpose: it is a hint, not a second CTA competing with Share. */
+  .chPrevShot::after{content:"";position:absolute;left:50%;top:50%;width:0;height:0;
+    transform:translate(-42%,-50%);border-left:9px solid rgba(255,255,255,.92);
+    border-top:6px solid transparent;border-bottom:6px solid transparent;
+    filter:drop-shadow(0 1px 3px rgba(0,0,0,.75));pointer-events:none;}
+  .chPrevTxt{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:6px;}
+  /* THE PAYWALL'S FACE. Same --display used by .pwTitle and the wordmark, so this row reads
+     as part of the app rather than as a system label. */
+  .chPrevTxt b{font-family:var(--display);font-weight:700;font-size:15.5px;letter-spacing:-.2px;color:#fff;}
+  .chPrevChips{display:flex;gap:6px;flex-wrap:wrap;}
+  /* The two numbers are the DEAL being offered, so they stop being grey run-on text and
+     become the only coloured thing in the row. "no app needed" is gone: it answered a
+     question nobody was asking here and diluted the two that matter. */
+  .chChip{font-size:11.5px;font-weight:800;color:var(--mint);background:rgba(95,230,164,.12);
+    border:1px solid rgba(95,230,164,.26);border-radius:999px;padding:3px 9px;white-space:nowrap;}
+  .chPrevGear{flex:0 0 auto;width:38px;height:38px;border-radius:13px;padding:0;
+    border:1px solid var(--stroke);background:rgba(255,255,255,.06);color:rgba(255,255,255,.72);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;transition:transform .12s cubic-bezier(.3,1.5,.5,1);}
+  .chPrevGear:active{transform:scale(.9);}
+  .chPrevGear svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;}
   .ivPrev{display:flex;align-items:center;gap:11px;width:100%;margin:-2px 0 9px;padding:9px 11px;
     border-radius:14px;border:1px solid rgba(95,230,164,.28);background:rgba(95,230,164,.08);
     animation:ivIn .28s cubic-bezier(.2,1.2,.4,1);}
@@ -1078,7 +1159,7 @@
          nothing in this app is a daily challenge. "Challenge" here means the share format,
          the "Challenge a friend" invite, and the inbound referral hint — all of which are
          FREE. Printing it next to a price would be selling a feature that does not exist. -->
-    <div class="pwSub" id="pwSub">Any size and color of brush · 75s to paint instead of 22s</div>
+    <div class="pwSub" id="pwSub">Any brush and color · no clock to line it up · 75s to paint instead of 32s</div>
     <!-- Weekly starts HIDDEN on purpose: the subscription isn't approved yet, so the
          store won't sell it. applyPlanAvailability() reveals it the moment a real
          weekly price arrives from the native layer. Fail-safe: if no prices ever
@@ -1205,6 +1286,16 @@
          Kept hidden until updateInviteBtn() runs, so a JS failure cannot leave a button
          that no handler is listening to. -->
     <button class="ssBtn ssInvite" id="ssInvite" style="display:none">Challenge a friend</button>
+    <!-- Declared here rather than built in JS so the pre-push check can see its ids, and so a
+         JS failure leaves an empty card instead of a half-built one. Shown by chPrevRender(). -->
+    <div class="chPrev" id="chPrev">
+      <button class="chPrevShot" id="chPrevShot" aria-label="Preview what they receive"></button>
+      <div class="chPrevTxt">
+        <b>They get this</b>
+        <div class="chPrevChips"><span class="chChip" id="chChipS">20s</span><span class="chChip" id="chChipT">5 taps</span></div>
+      </div>
+      <button class="chPrevGear" id="chPrevGear" aria-label="Challenge settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.1"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 7.5 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.1-2.7H1.7a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 7.5a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 2.7-1.1V1.7a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.7 1.1 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7h.1a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.1 2.7z" transform="translate(0.3 0.3) scale(0.96)"/></svg></button>
+    </div>
     <button class="ssBtn ig" data-target="instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5.2"/><circle cx="12" cy="12" r="4.1"/><circle cx="17.3" cy="6.7" r="1.15" fill="currentColor" stroke="none"/></svg>Instagram</button>
     <!-- SNAPCHAT AND TIKTOK ARE GONE AS BUTTONS, not as destinations. This sheet had nine
          tappable things in it; a share sheet that asks nine questions gets answered by the
@@ -1447,15 +1538,18 @@ function animate(){ requestAnimationFrame(animate); if(mode!=="compose"||!render
 // when the camera didn't open, so a normal launch stays splash→camera with no
 // flash of hero copy in between.
 /* `reason` says WHY this screen is on the user's phone, and it is the whole point of the
-   event. Since priming, every new install sees the hero on first launch, so "shown" no
-   longer implies "something failed" — primed, denied and no_camera are three different
-   populations that need reading apart.
-   Fires ONCE: revealHero() is called from the auto-failure path and again from the 2.5s
+   event. The live reasons are denied, no_camera, insecure_context, no_getusermedia and
+   boot_pending — the permission sheet is up and nothing has settled yet. "primed" is GONE:
+   it died with the priming boot in `df4289d`, which restored camera-first because the
+   localStorage gate it depended on is wiped on every launch inside the 1.0.2 WebView.
+   Fires ONCE: revealHero() is called from the auto-failure path and again from the boot
    failsafe, and a screen counted twice makes every rate computed against it wrong.
-   ⚠️ hero_shown is a NEW event name, so the wrapper's WEB_EVENTS allow-list drops it until
-   a build carrying it ships — 1.0.7 is already in review without it. Until then the
-   priming effect is still readable from camera_granted/camera_denied, which carry `auto`:
-   auto=true is the old straight-to-camera launch, auto=false is a tap on the primed hero. */
+   ⚠️ hero_shown IS on the wrapper's WEB_EVENTS allow-list — but that list only exists in
+   builds from 1.0.9. On 1.0.2, which is ~96% of installs, track() posts to a bridge that
+   drops any name it doesn't know, so this event reads as zero in Amplitude no matter how
+   many times it fires. It starts producing data when 1.0.9 reaches users, not when it is
+   deployed here. Until then camera_granted/camera_denied carry `auto` and are the handle:
+   auto=true is a straight-to-camera launch, auto=false is a tap on the hero. */
 let heroShown=false;
 /* The OS has refused the camera for this session. iOS never re-prompts, so this is a
    one-way latch: nothing after it should send the user back down the camera path. */
@@ -2642,7 +2736,7 @@ const PW_CAP={ size:1, color:1, round_end:2, time:2 };
    Same bet and same downside as the per-source caps: fewer paywalls could mean fewer
    trials rather than more. `nth_interruption` on paywall_viewed is what settles it — if
    conversion past the 3rd interruption is not flat, this number is too low. */
-const PW_USER_INITIATED=new Set(["plus","mark","brand"]);
+const PW_USER_INITIATED=new Set(["plus","mark","brand","chset"]);
 
 const PW_GLOBAL_CAP=3;
 let pwInterruptions=0;         // non-user-initiated opens this launch
@@ -2662,7 +2756,7 @@ const pwSourceOpens={};
    Every other source keeps its pill; they fire from places with no control to light up. */
 const PW_LOCK_HINT={
   color: "Every colour is KAMO+ — tap to unlock",
-  round_end:"More time, every tool — tap for KAMO+",
+  round_end:"No aim clock, more paint time, every tool — tap for KAMO+",
   time:  "75 seconds to paint — tap for KAMO+",
 };
 /* THE LOCK ANSWERS ON THE CONTROL, NOT IN A SENTENCE. Past its cap, touching the size bar
@@ -2691,8 +2785,19 @@ const PW_PITCH={
            s:"Free gets three shades off the photo. KAMO+ opens them all." },
   mark:  { t:"Your hide, without our name on it",
            s:"No mark on the image or the reveal clip." },
+  /* The free clock moved 22 -> 32 on 2026-08-06, so "instead of 22" became a false number on
+     the one line of the paywall that makes a measurable claim. It also stopped being a 3.4x
+     gap, which is why the line now says what the multiple IS rather than leaving the reader
+     to divide: 2.3x reads as small when it is written as two bare numbers and large when it
+     is named. Keep in sync with PAINT_SECONDS / PRO_PAINT_SECONDS and #pwSub. */
+  /* THE GEAR IS THE ONLY PLACE IN THE APP WHERE SOMEONE ASKS TO CHANGE THE GAME THEY ARE
+     SENDING. Answering that with the generic sheet wastes the clearest intent signal the
+     paywall ever gets — they did not stumble into it, they reached for a control. So the
+     copy names the thing they just tried to touch, and nothing else. */
+  chset: { t:"Set the challenge yourself",
+           s:"Free sends 5 taps on a fixed clock. KAMO+ lets you choose both — make it easy, or make it impossible." },
   time:  { t:"Stop losing hides to the clock",
-           s:"75 seconds to paint instead of 22." },
+           s:"Line up your shot with no clock at all, then 75 seconds to paint instead of 32." },
 };
 /* Snapshot the markup copy ONCE, before anything can overwrite it. Read lazily instead and
    the first tool-specific open would become the new "default". */
@@ -2913,8 +3018,8 @@ function showKamoPlus(){ const el=$("#kamoPlus"); if(!el) return;
   /* "Every camo brush" outlived the brushes by two releases. What was actually bought is
      the colour picker, the fine brush and the clock. */
   const sub=$("#kpSub"); if(sub) sub.textContent = lifetime
-    ? "Every color, the fine brush and 75-second rounds — yours forever. Now go disappear."
-    : "Every color, the fine brush and 75-second rounds — cancel anytime.";
+    ? "Every color, the fine brush, no aim clock and 75-second rounds — yours forever. Now go disappear."
+    : "Every color, the fine brush, no aim clock and 75-second rounds — cancel anytime.";
   el.classList.add("show"); haptic(20); kpConfetti(); track("kamo_plus_welcome_shown",{plan:pwPlan}); }
 { const g=$("#kpGo"); if(g) g.onclick=()=>{ const el=$("#kamoPlus"); if(el) el.classList.remove("show"); haptic(10); track("kamo_plus_welcome_done"); }; }
 
@@ -3121,6 +3226,9 @@ function forceFreeAsk(){
       +'<button id="ffOk" style="flex:1;height:44px;border-radius:12px;border:none;background:#5fe6a4;color:#04160d;font-size:15px;font-weight:800">OK</button>'
       +'</div></div>';
     document.body.appendChild(w);
+    const send=()=>{ close(); document.getElementById("ssInvite")?.click(); };
+    document.getElementById("chPPsend").onclick=send;
+    document.getElementById("chPPx0").onclick=()=>close();
     const inp=w.querySelector("#ffIn");
     /* 16px on the input on purpose: anything smaller makes iOS zoom the page on focus. */
     setTimeout(()=>{ try{ inp.focus(); }catch(e){} },60);
@@ -3352,8 +3460,25 @@ function drawWatermark(c,W,H){
      fillText, no allocations, no measureText. */
   if(isPro) return;
   const u=W/390, pad=Math.round(H*0.028); c.textAlign="center";
-  // bottom scrim
-  const bh=Math.round(H*0.17); let bg=c.createLinearGradient(0,H-bh,0,H); bg.addColorStop(0,"rgba(4,6,10,0)"); bg.addColorStop(.45,"rgba(4,6,10,.6)"); bg.addColorStop(1,"rgba(4,6,10,.93)"); c.fillStyle=bg; c.fillRect(0,H-bh,W,bh);
+  /* BOTTOM SCRIM — EASED, AND ITS SHAPE NO LONGER DEPENDS ON ITS HEIGHT.
+     This drew a visible horizontal seam across the photo, and it had been "fixed" twice in
+     CSS, which could never have worked: the seam is painted HERE, into the canvas, so no
+     rule on #paintUI was ever touching it.
+     The cause is in the history logged just below. The scrim shrank .26H -> .22H -> .17H as
+     hook lines were dropped, but the stops stayed at 0 -> .6 -> .93. That ramp used to climb
+     to 60% black over .117H; at .17H it does it over .0765H — the same curve compressed 35%,
+     and an alpha rising that fast over a smooth photo reads as an edge rather than a fade.
+     Every redesign that shortened the band sharpened it again.
+     So the stops are an ease-in now, and the band is tall enough that the onset is spread
+     over a distance the eye cannot resolve: alpha stays under 10% for the first half, which
+     is what removes the seam, then accelerates into the same near-opaque bottom the wordmark
+     needs to stay legible over a bright sky. Still one gradient and one fill — this runs on
+     every rAF of the Done animation and every pointermove of the slider drag. */
+  const bh=Math.round(H*0.32); let bg=c.createLinearGradient(0,H-bh,0,H);
+  bg.addColorStop(0,"rgba(4,6,10,0)"); bg.addColorStop(.30,"rgba(4,6,10,.03)");
+  bg.addColorStop(.50,"rgba(4,6,10,.10)"); bg.addColorStop(.66,"rgba(4,6,10,.24)");
+  bg.addColorStop(.78,"rgba(4,6,10,.45)"); bg.addColorStop(.88,"rgba(4,6,10,.70)");
+  bg.addColorStop(1,"rgba(4,6,10,.93)"); c.fillStyle=bg; c.fillRect(0,H-bh,W,bh);
   /* ONE line now: the wordmark. This block has lost a line twice, and both times the fix
      was to re-space rather than leave a hole — an overlay that floats above a band of empty
      gradient reads as a rendering bug, not as restraint.
@@ -3413,9 +3538,18 @@ function postNative(o){ if(window.ReactNativeWebView){ try{ window.ReactNativeWe
    Exactly one name goes out per launch, never both, so nothing is double counted. Segment on
    carrier_for either way; the event name it rides under stops mattering. */
 const CARRIER_102={round_finished:"reveal_previewed",invite_tapped:"camera_requested",purchase_initiated:"paint_started"};
+/* THREE POPULATIONS NOW, ONE CALL SITE.
+   - `eventsV2` (1.0.9 and later): the wrapper allow-lists the real names, so send them. The
+     carrier era ends the moment that build is the only one left.
+   - caps without eventsV2: a build that announces itself but still filters the real names.
+     Rides torch_toggled, which is on that list and dead on iOS.
+   - no caps at all (1.0.2, the only public build): the original three carriers.
+   `carrier_for` is stamped in every case, so a single Amplitude segment spans all three and
+   the migration needs no chart rewrite. */
 function trackCarried(kind,props){
-  const newer=!!(nativeCaps && Object.keys(nativeCaps).length);
-  track(newer?"torch_toggled":CARRIER_102[kind], Object.assign({carrier_for:kind},props||{}));
+  const caps=nativeCaps&&Object.keys(nativeCaps).length?nativeCaps:null;
+  const name = caps && caps.eventsV2 ? kind : (caps ? "torch_toggled" : CARRIER_102[kind]);
+  track(name, Object.assign({carrier_for:kind},props||{}));
 }
 function track(event,props){
   const p={...(props||{}),trial_arm:trialArm};
@@ -3749,23 +3883,174 @@ function chCopy(text){
    in sync and no network round trip: a 168px canvas drawn from the composited hide. The
    numbers are the same ones the seeker will actually get — LIMIT is derived from the round
    time exactly as chSeek() derives it, so this cannot promise 28s and then hand over 20. */
-function invitePreview(){
+/* ===== chPreview =========================================================================
+ * The card under "Challenge a friend" that shows the recipient's side of the deal.
+ *
+ * BEHIND ?new=1 UNTIL IT IS APPROVED. Pushing this repo IS deploying it — Pages serves the
+ * file to every live user within minutes and the WebView refetches on every launch — so a
+ * new component cannot be tried on a few people the way a native build can. The flag is the
+ * substitute for a staging environment: the code ships dormant, it is opened by hand at
+ * ?new=1, and turning it on for everyone later is deleting one condition, not deploying
+ * anything new. Without the flag the old 4.2s toast still runs, unchanged.
+ */
+
+/* The hider's chosen clock and tap budget. null on both = derive them, which is what every
+ * hide did before this existed and what the server still stores for them. Kept in
+ * localStorage rather than in a variable because the choice should outlive the round. */
+const CH_LIM_KEY="kamo_ch_limit", CH_TAP_KEY="kamo_ch_taps";
+function chDerivedLimit(){ const secs=roundSeconds(); return Math.max(20,Math.min(45,(secs||10)*2)); }
+function chSettings(){
+  let l=null,t=null;
+  try{ const a=parseInt(localStorage.getItem(CH_LIM_KEY),10); if(a>=10&&a<=120) l=a;
+       const b=parseInt(localStorage.getItem(CH_TAP_KEY),10); if(b>=1&&b<=20) t=b; }catch(e){}
+  return {limit:l, taps:t};
+}
+/* What the seeker will ACTUALLY get, custom or derived — one function so the chips, the
+ * preview and the row can never disagree with each other or with the published hide. */
+function chEffective(){
+  const st=chSettings();
+  return { limit: st.limit||chDerivedLimit(), taps: st.taps||CH_TAPS, custom: !!(st.limit||st.taps) };
+}
+
+function chPrevRender(){
   try{
-    const host=document.getElementById("ssInvite"); if(!host||!host.parentNode) return;
-    document.getElementById("ivPrev")?.remove();
-    const secs=roundSeconds(), LIMIT=Math.max(20,Math.min(45,(secs||10)*2));
+    const row=document.getElementById("chPrev"); if(!row) return;
+    const e=chEffective();
+    document.getElementById("chChipS").textContent=e.limit+"s on the clock";
+    document.getElementById("chChipT").textContent=e.taps+(e.taps===1?" tap":" taps");
+    const shot=document.getElementById("chPrevShot");
+    shot.querySelector("canvas")?.remove();
     const c=document.createElement("canvas");
     const S=Math.min(1,168/Math.max(board.width,board.height));
     c.width=Math.round(board.width*S); c.height=Math.round(board.height*S);
     c.getContext("2d").drawImage(board,0,0,c.width,c.height);
-    const w=document.createElement("div"); w.id="ivPrev"; w.className="ivPrev";
-    w.innerHTML='<div class="ivShot"></div>'
-      +'<div class="ivTxt"><b>They get this</b><span>'+LIMIT+'s on the clock · 5 taps · no app needed</span></div>';
-    w.querySelector(".ivShot").appendChild(c);
-    host.parentNode.insertBefore(w, host.nextSibling);
-    setTimeout(()=>{ w.classList.add("out"); setTimeout(()=>w.remove(),320); },4200);
+    shot.appendChild(c);
+    /* BOUND HERE, not at load: this is the only point where the card is guaranteed to exist
+       and to be about to be shown. onclick (not addEventListener) on purpose — chPrevRender
+       runs again on every share sheet open, and a listener would stack a duplicate each
+       time, so the preview would open twice, then three times. */
+    shot.onclick=(ev)=>{ ev.stopPropagation(); haptic(10); chPrevPlay(); };
+    const gear=document.getElementById("chPrevGear");
+    if(gear) gear.onclick=(ev)=>{ ev.stopPropagation(); haptic(10); chPrevSettings(); };
+    row.classList.add("on");
   }catch(e){}
 }
+
+/* LOCAL, AND IT MUST STAY LOCAL. The real seeker sends every tap to submit_attempt, and the
+ * hide carries the counters the receiver screen reads back out ("X of Y never found them").
+ * Previewing against the live link would file the sender's own taps as real attempts and
+ * corrupt the one number this whole feature exists to produce. So nothing here touches the
+ * network: the board and chGeom() are already on this device — the sender painted them.
+ *
+ * AND IT IS A PREVIEW, NOT A ROUND. They know where it is; they painted it. The clock and
+ * the pips are here so they see the frame their friend gets, not to test them. That is why
+ * the ending button is "Challenge a friend" and not "Try again": the detour has to come back
+ * to the send, or it is just a toy inside the one sheet whose job is to produce a share. */
+function chPrevPlay(){
+  try{
+    const g=chGeom(); if(!g) return;
+    const e=chEffective();
+    track("challenge_preview_opened",{limit:e.limit,taps:e.taps,custom:e.custom});
+    document.getElementById("chPP")?.remove();
+    const w=document.createElement("div"); w.id="chPP"; w.className="chPP";
+    w.innerHTML='<div class="chPPin">'
+      +'<div class="chPPh" id="chPPh">What they see</div>'
+      +'<div class="chPPframe" id="chPPframe"></div>'
+      +'<div class="chPPbar"><i id="chPPfill"></i></div>'
+      +'<div class="chPPmeta"><span id="chPPclock"></span><span id="chPPpips"></span></div>'
+      +'<div class="chPPfoot" id="chPPfoot">'
+      /* THE SEND IS AVAILABLE FROM THE FIRST FRAME, not only after the round ends. Making
+         someone finish — or lose — a preview before they can send is a toll on the one
+         action this sheet exists to produce. They opened it to check what the other person
+         gets; the moment they are satisfied is theirs to choose, not ours. */
+      +'<button class="ssBtn ssInvite" id="chPPsend">Challenge a friend</button>'
+      +'<button class="chPPclose" id="chPPx0">Back</button>'
+      +'</div></div>';
+    document.body.appendChild(w);
+
+    const frame=document.getElementById("chPPframe");
+    const img=document.createElement("canvas");
+    img.width=board.width; img.height=board.height;
+    img.getContext("2d").drawImage(board,0,0);
+    frame.appendChild(img);
+
+    let left=e.limit, tries=0, over=false;
+    const pips=()=>{ document.getElementById("chPPpips").textContent="●".repeat(Math.max(0,e.taps-tries))+"○".repeat(Math.min(tries,e.taps)); };
+    const clock=()=>{ document.getElementById("chPPclock").textContent=left+"s";
+      document.getElementById("chPPfill").style.width=(100*left/e.limit)+"%"; };
+    clock(); pips();
+    const iv=setInterval(()=>{ if(over) return; left--; clock(); if(left<=0) end("Out of time","They never found you."); },1000);
+
+    function end(head,sub){
+      if(over) return; over=true; clearInterval(iv);
+      document.getElementById("chPPh").textContent=head;
+      document.getElementById("chPPfoot").innerHTML=
+        '<div class="chPPsub">'+sub+'</div>'
+        +'<button class="ssBtn ssInvite" id="chPPgo">Challenge a friend</button>'
+        +'<button class="chPPclose" id="chPPx">Back</button>';
+      document.getElementById("chPPgo").onclick=send;
+      document.getElementById("chPPx").onclick=close;
+    }
+    function close(){ over=true; clearInterval(iv); w.remove(); }
+
+    img.onclick=(ev)=>{
+      if(over) return;
+      const r=img.getBoundingClientRect();
+      const x=(ev.clientX-r.left)/r.width, y=(ev.clientY-r.top)/r.height;
+      const d=Math.hypot(x-g.cx,y-g.cy);
+      if(d<=g.r){ haptic(18); end("Found you","That is the screen they get."); return; }
+      tries++; pips(); haptic(8);
+      img.classList.remove("chPPshake"); void img.offsetWidth; img.classList.add("chPPshake");
+      if(tries>=e.taps) end("Out of taps","They never found you.");
+    };
+    w.onclick=(ev)=>{ if(ev.target===w) close(); };
+  }catch(e){}
+}
+
+/* KAMO+ ONLY, and the free tap is a paywall trigger rather than a dead control: a locked
+ * button that does nothing teaches people the app is broken, one that opens the offer at the
+ * moment they wanted the feature is the whole point of gating it here. */
+function chPrevSettings(){
+  if(!isPro){ track("plan_selected",{plan:"challenge_settings"}); openPaywall("chset"); return; }
+  try{
+    const e=chEffective();
+    document.getElementById("chSet")?.remove();
+    const w=document.createElement("div"); w.id="chSet"; w.className="chPP";
+    const row=(id,label,val,min,max,step)=>'<div class="chSetRow"><span>'+label+'</span>'
+      +'<div class="chSetCtl"><button data-a="-" data-t="'+id+'">−</button><b id="'+id+'">'+val+'</b>'
+      +'<button data-a="+" data-t="'+id+'">+</button></div></div>';
+    w.innerHTML='<div class="chPPin"><div class="chPPh" id="chSetH">Their challenge</div>'
+      +row("chSetS","Seconds on the clock",e.limit)
+      +row("chSetT","Taps they get",e.taps)
+      +'<div class="chPPsub">Bounded 10–120s and 1–20 taps. The server clamps it too, so a hand-edited request cannot publish an unplayable round.</div>'
+      +'<button class="ssBtn ssInvite" id="chSetOk">Done</button>'
+      +'<button class="chPPclose" id="chSetReset">Back to automatic</button></div>';
+    document.body.appendChild(w);
+    const clampS=(v)=>Math.max(10,Math.min(120,v)), clampT=(v)=>Math.max(1,Math.min(20,v));
+    w.querySelectorAll("[data-a]").forEach(b=>{ b.onclick=()=>{
+      const el=document.getElementById(b.dataset.t); const d=b.dataset.a==="+"?1:-1;
+      const isS=b.dataset.t==="chSetS";
+      el.textContent = isS ? clampS(parseInt(el.textContent,10)+d*5) : clampT(parseInt(el.textContent,10)+d);
+      haptic(6); }; });
+    document.getElementById("chSetOk").onclick=()=>{
+      try{ localStorage.setItem(CH_LIM_KEY,document.getElementById("chSetS").textContent);
+           localStorage.setItem(CH_TAP_KEY,document.getElementById("chSetT").textContent); }catch(e){}
+      track("challenge_settings_saved",{limit:parseInt(document.getElementById("chSetS").textContent,10),
+                                        taps:parseInt(document.getElementById("chSetT").textContent,10)});
+      w.remove(); chPrevRender(); };
+    document.getElementById("chSetReset").onclick=()=>{
+      try{ localStorage.removeItem(CH_LIM_KEY); localStorage.removeItem(CH_TAP_KEY); }catch(e){}
+      track("challenge_settings_reset",{}); w.remove(); chPrevRender(); };
+    w.onclick=(ev)=>{ if(ev.target===w) w.remove(); };
+  }catch(e){}
+}
+
+/* THE TOAST IS GONE. It lived here for one reason — the card had not been seen by anyone
+   yet — and it deleted itself after 4.2s, which is why it could never carry the settings
+   control or a tap target. chPrevRender() draws the permanent card instead, for everyone.
+   The old body is deleted rather than left behind a flag: dead code that cannot run is the
+   drift this file keeps paying for elsewhere. */
+function invitePreview(){ chPrevRender(); }
 $("#ssInvite").onclick=async()=>{
   haptic(10);
   const sc=Math.round(currentScore||0), secs=roundSeconds();
@@ -3784,8 +4069,21 @@ $("#ssInvite").onclick=async()=>{
      the challenge loop, arrived at without hosting anything.
      chLink() still wins when a hide has been published — that link is strictly better,
      being the actual puzzle. */
-  const text=(secs?("🫥 I made someone vanish in "+secs+"s."):"🫥 I hide people in plain sight.")
-    +"\n\nBeat that → "+(chLink()||inviteUrl());
+  /* WRITTEN FOR THE RECEIVER'S TASK, NOT THE SENDER'S BRAG. The old line led with
+     "I made someone vanish in 22s" and closed on "Beat that →", which asks the receiver to
+     beat a hiding time — except the receiver does not hide, they SEEK. Nothing in the
+     message said what they were being asked to do, or that there was a limit on it.
+     Now: what is hidden, what they get, and the link on its own line so every messaging app
+     renders it tappable. The tap budget is the stake, and it is read from the same
+     chEffective() the preview and the published hide use, so the message cannot promise a
+     number the round does not honour. */
+  /* Defensive: this is the share path, and a throw here costs the send. chEffective() reads
+     localStorage and a const declared further down the file — both fine at click time, but
+     the fallback is the shipped default rather than a broken message. */
+  let taps=5; try{ taps=chEffective().taps||5; }catch(_){}
+  const text="🫥 There's a body hidden in this photo."
+    +"\nYou get "+taps+(taps===1?" tap":" taps")+" to find it."
+    +"\n\n"+(chLink()||inviteUrl());
   const b=$("#ssInvite"), original=b?b.innerHTML:"";
   /* Handled by builds that know `invite`, ignored by 1.0.2. Sent either way, and nothing
      below depends on it answering — that assumption is what killed this button once. */
@@ -3793,6 +4091,28 @@ $("#ssInvite").onclick=async()=>{
   /* THE ANSWER LANDS ON THE BUTTON, not in a toast 700ms after the sheet closed. The thumb
      is already here, and a primary action whose only feedback can fail to render is a
      primary action that reads as broken. The sheet stays open until it has said something. */
+  /* THE SYSTEM SHEET FIRST, CLIPBOARD AS THE FALLBACK — the two were the other way round.
+     Copy asks the sender to leave KAMO, pick an app, find a thread and paste; the share
+     sheet puts the message into iMessage or WhatsApp in one tap. For the single action this
+     whole sheet exists to produce, that gap is the feature.
+     It is called BEFORE any await, because navigator.share needs the user activation from
+     this tap and the first await spends it. AbortError means they opened the sheet and
+     chose to close it — that is a decision, not a failure, so it must not fall through to
+     the clipboard and claim something was copied. Any other error means the sheet never
+     opened, and the clipboard path below is exactly what shipped before. */
+  let shared=false, cancelled=false;
+  try{
+    if(navigator.share){ await navigator.share({text:text}); shared=true; }
+  }catch(err){ if(err&&err.name==="AbortError") cancelled=true; }
+  if(shared||cancelled){
+    track("invite_shared",{ok:shared,cancelled:cancelled});
+    if(b){
+      b.innerHTML = shared ? '<span class="ic">✅</span>Sent' : original;
+      if(shared){ invitePreview(); setTimeout(()=>{ if(b) b.innerHTML=original; },1500); }
+    }
+    return;
+  }
+
   const ok=await chCopy(text);
   track("invite_copied",{ok:ok});
   if(b){
@@ -3840,17 +4160,18 @@ function maybeOnboardPaint(){ if(!firstRun()) return; try{ localStorage.setItem(
    It creates the tension the format is built on, and it GUARANTEES every round lands
    on the reveal, which is the share surface.
 
-   AIM (8s)   -> auto-capture. PAINT (22s) -> auto-Done -> reveal.
-   ~30s a round, down from 60. The old numbers were set when the colour row still had a free
-   all-colours picker and three pattern brushes to work through; with that gone there is far
-   less to do. Shorter also sharpens the KAMO+ clock: 22 -> 75 is a difference you feel,
-   where 45 -> 90 was just two long rounds.
+   AIM (18s)  -> auto-capture. PAINT (32s) -> auto-Done -> reveal.
+   ~50s a round. It was ~30s (aim 8 / paint 22) and both free clocks gained 10s on
+   2026-08-06: a round that ends before the hide is recognisable kills the only thing worth
+   sharing, which is the reveal. Pro is untouched, so the KAMO+ gap narrows from 22->75
+   (3.4x) to 32->75 (2.3x) — still the most-felt perk, but the clock now sells less hard
+   than it did. If time-sourced paywall conversion drops, this is the change that did it.
 
    ARMED FROM THE FIRST HIDE, both phases. It used to skip hide one entirely, which meant
    a new player met the product with no clock anywhere and no idea it was a timed game.
    First run still gets protection, but as a longer AIM window (FIRST_AIM_SECONDS) rather
-   than as no clock: maybeOnboard() needs 7.2s to teach, and an 8s aim would fire on the
-   beat it finishes.
+   than as no clock: maybeOnboard() needs 7.2s to teach, and a standard aim would fire on
+   the beat it finishes.
 
    Driven by ONE CSS transition on a transform. No rAF, no per-frame JS, no
    allocation; the only timers are two setTimeouts. */
@@ -3861,20 +4182,24 @@ function maybeOnboardPaint(){ if(!firstRun()) return; try{ localStorage.setItem(
    wrong is costly in both directions: too tight and the clock snatches a badly-framed shot,
    too loose and the round opens with dead air. So it fits itself to the person instead:
    remember how long their recent captures actually took and give them that plus headroom,
-   clamped to a sane band. Someone who lines up a shot in 4s gets a taut 8s; someone the
-   clock keeps beating gets pushed out toward 14s until it stops beating them.
+   clamped to a sane band. Someone who lines up a shot in 4s gets a taut 18s; someone the
+   clock keeps beating gets pushed out toward 24s until it stops beating them.
    Adjusts only BETWEEN rounds, so the clock never changes under you mid-aim. */
-/* Cut again: aim 10 -> 8 (band 7-18 -> 6-14), paint 30 -> 22. Free rounds are now ~30s.
+/* +10s ON BOTH FREE CLOCKS (2026-08-06): aim 8 -> 18, paint 22 -> 32.
+   THE WHOLE BAND MOVES WITH THE DEFAULT, not just the default. AIM_MAX was 14, so leaving
+   it there would have handed the adaptive branch a ceiling BELOW the new default: anyone
+   with two rounds of history would be clamped straight back down to 14s and the +10 would
+   exist only for brand-new players. Band 6-14 -> 16-24, i.e. the same ±band around the new
+   default. Same reason FIRST_AIM_SECONDS moves: at 15 it was no longer the LONGER first-run
+   window it is documented to be, it was 3s shorter than a standard aim.
+   Previous pass, for the record: aim 10 -> 8 (band 7-18 -> 6-14), paint 30 -> 22.
    ⚠️ A "the paint clock feels far too long" report was once acted on and had to be reverted:
    it came from a KAMO+ account, which is on PRO_PAINT_SECONDS=75, not this number. Before
    touching PAINT_SECONDS again, confirm the report is from a FREE round.
-   The floor under this is the FREE_BRUSH change in the same pass — a 44px roller covers a
-   figure in a handful of strokes, so 30s of paint had become slack at the end rather than
-   pressure. Two levers moving together: less time AND a coarser brush, which is what makes
-   the free output visibly rougher than a KAMO+ one instead of merely slower to produce.
-   ⚠️ If share_opened per session drops, this is the change to look at first — a round that
-   ends before the hide is recognisable kills the only thing worth sharing. */
-const AIM_DEFAULT=8, AIM_MIN=6, AIM_MAX=14, PAINT_SECONDS=22;
+   ⚠️ These numbers are PRINTED at three copy sites — #pwSub, PW_PITCH.time.s and the
+   PW_LOCK_HINT line. A silent change here makes the paywall state a false number, which is
+   a pricing-adjacent claim. Change them together. */
+const AIM_DEFAULT=18, AIM_MIN=16, AIM_MAX=24, PAINT_SECONDS=32;
 /* KAMO+ BUYS TIME. The clock is the single most-felt constraint in the product — it is
    what makes people lose a hide they were enjoying — so "no rush" is a perk you feel every
    round, unlike a brush that has a free substitute sitting next to it.
@@ -3882,19 +4207,21 @@ const AIM_DEFAULT=8, AIM_MIN=6, AIM_MAX=14, PAINT_SECONDS=22;
    ⚠️ The comment above argues PAINT must stay identical for everyone "because the round
    time is the score". That still holds for the DISPLAYED time — a Pro user who takes 50s
    still shows "vanished in 50s", the limit only decides when the clock takes the round
-   away. What does change is coverage: a 22s auto-Done can end a hide mid-paint, so Pro
-   hides will trend better-covered. Accepted deliberately — that IS the perk, and at 22 vs
-   75 it is now a 3.4x gap rather than the 2x it started as. */
+   away. What does change is coverage: a 32s auto-Done can end a hide mid-paint, so Pro
+   hides will trend better-covered. Accepted deliberately — that IS the perk, though at
+   32 vs 75 the gap is 2.3x, down from the 3.4x it was at 22s. */
 const PRO_PAINT_SECONDS=75, PRO_AIM_BONUS=8, PRO_AIM_MAX=30;
 function paintSeconds(){ return canPro()?PRO_PAINT_SECONDS:PAINT_SECONDS; }
 function aimHistory(){ try{ return JSON.parse(localStorage.getItem("kamo_aim")||"[]"); }catch(e){ return []; } }
-/* HIDE ONE ONLY. maybeOnboard() spends 7.2s on two hints; this leaves ~8s of aiming after
+/* HIDE ONE ONLY. maybeOnboard() spends 7.2s on two hints; this leaves ~18s of aiming after
    they clear, which is a normal round. It replaces "no clock at all on the first hide" —
    the player now sees the countdown from their first second and learns the rule by reading
    it, instead of discovering on hide two that this was a timed game all along.
    Read BEFORE the history branch on purpose: aimHistory() is empty on hide one, so that
-   branch would hand back the standard 8s and put the tutorial in a race it loses. */
-const FIRST_AIM_SECONDS=15;
+   branch would hand back the standard aim and put the tutorial in a race it loses.
+   MUST STAY ABOVE AIM_DEFAULT. At 15 against the new 18s default this was the shorter
+   window, which inverts the whole point of it. Moved 15 -> 25 with the +10s pass. */
+const FIRST_AIM_SECONDS=25;
 function aimSeconds(){
   if(firstRun()) return FIRST_AIM_SECONDS;
   /* Pro gets the bonus AND a raised ceiling. Adding the bonus alone would do almost
@@ -3931,7 +4258,17 @@ let timerEnd=0, timerPhase=null, _timerDone=null, _timerTick=null, _timerSec=nul
    nothing left to teach (maybeOnboardPaint deliberately shows no hint) and the round is
    the thing.
    Kept as a function, and still called per phase, so a future phase can opt out again. */
-function timerArmed(){ return true; }
+/* THE AIM PHASE IS UNTIMED FOR MEMBERS, THE PAINT PHASE IS NOT — and the asymmetry is the
+   whole point rather than a half-measure.
+   Aiming carries no score. Finding a wall and framing it is friction, so a clock there only
+   punishes; removing it is pure comfort and costs the game nothing.
+   Painting IS the scored part. Coverage is what the reveal brags about and what the seeker
+   plays against, so it has to stay under tension. Lift that clock too and every paid hide
+   trends to 100 %, the free recipient loses every single challenge, and the loop that
+   recruits them stops being fun to be on the receiving end of — the seeker is the
+   acquisition. The 22 -> 75 gap already trades coverage for the perk, deliberately and
+   measured; infinity is not the same trade with a bigger number, it is a different game. */
+function timerArmed(phase){ return !(phase === "aim" && canPro()); }
 function stopTimer(){
   if(_timerDone){ clearTimeout(_timerDone); _timerDone=null; }
   if(_timerTick){ clearTimeout(_timerTick); _timerTick=null; }
@@ -4026,7 +4363,17 @@ function runExpire(fn){ if(midGesture()){ pendingExpire=fn; return; } fn(); }
 function flushExpire(){ const f=pendingExpire; if(!f) return; pendingExpire=null; f(); }
 function startTimer(phase,seconds,onExpire){
   stopTimer();
-  if(!timerArmed(phase)) return;
+  if(!timerArmed(phase)){
+    /* No clock, but the screen still has to say what to do. stopTimer() has just hidden the
+       tag along with the bar, and leaving it hidden would strip the aim screen of its only
+       instruction — a silent regression that reads as a missing feature, not as a perk.
+       The counters are cleared rather than left stale: photo_captured reports aim_given and
+       aim_took, and a value carried over from a previous timed round would quietly claim an
+       aim clock that never ran. */
+    aimStartedAt=0; aimGiven=0;
+    if(phase==="aim"){ timerTag.textContent="Find a spot"; timerTag.className=""; timerTag.style.display=""; }
+    return;
+  }
   _timerOnExpire=onExpire;
   timerPhase=phase; timerEnd=Date.now()+seconds*1000;
   if(phase==="aim"){ aimStartedAt=Date.now(); aimGiven=seconds; }
@@ -4034,7 +4381,7 @@ function startTimer(phase,seconds,onExpire){
      via _timerTick — everything up to that point was a hairline bar and a static label.
      Not a per-frame loop: one interval writing one string. It runs at 250ms rather than
      1000ms so the displayed second changes when it actually changes, instead of lagging
-     by up to a full second — which on a 22s round is 5% of the clock. Four text writes a
+     by up to a full second — which on a 32s round is 3% of the clock. Four text writes a
      second is nothing next to the WebGL camera feed this sits on top of, and it stops the
      moment the phase does (stopTimer and pauseTimer both clear it). */
   const label = phase==="aim" ? "Find a spot" : "Make it vanish";
@@ -4548,8 +4895,15 @@ async function chUpload(){
     const up=await fetch(CH_URL+"/storage/v1/object/hides/"+name,{method:"POST",
       headers:{apikey:CH_KEY,Authorization:"Bearer "+CH_KEY,"Content-Type":"image/jpeg"},body:blob});
     if(!up.ok) throw new Error("upload "+up.status);
-    chId=await chRpc("create_hide",{p_img_path:name,p_cx:g.cx,p_cy:g.cy,p_r:g.r,
-      p_secs:roundSeconds(),p_coverage:Math.round(currentScore||0)});
+    /* The 8-argument overload only when the hider actually chose something. Sending nulls
+       would work identically, but calling the legacy signature keeps every automatic hide on
+       the exact path that has been running in production. */
+    const cs=chSettings();
+    chId=await chRpc("create_hide",(cs.limit||cs.taps)
+      ? {p_img_path:name,p_cx:g.cx,p_cy:g.cy,p_r:g.r,p_secs:roundSeconds(),
+         p_coverage:Math.round(currentScore||0),p_limit_s:cs.limit,p_max_taps:cs.taps}
+      : {p_img_path:name,p_cx:g.cx,p_cy:g.cy,p_r:g.r,p_secs:roundSeconds(),
+         p_coverage:Math.round(currentScore||0)});
     track("hide_published",{});
   }catch(e){ track("hide_publish_failed",{reason:String((e&&e.message)||e).slice(0,120)}); }
 }
@@ -4598,7 +4952,6 @@ function chSeek(){
     +".chFrame img{display:block;max-width:100%;max-height:56dvh;width:auto;height:auto;touch-action:manipulation;}"
     /* Taps left, as pips rather than a number: readable at a glance mid-game, and an empty
        row reads as "you are out" without anyone having to parse a zero. */
-    +".chPips{display:flex;gap:6px;justify-content:center;}"
     +".chPip{width:7px;height:7px;border-radius:50%;background:var(--mint);transition:background .2s,transform .2s;}"
     +".chPip.off{background:rgba(255,255,255,.16);transform:scale(.8);}"
     /* THE APP'S OWN CLOCK, not a new one. A bar that drains left to right, the same mint
@@ -4606,15 +4959,27 @@ function chSeek(){
        clock they have already read once. The number stays silent until the last five
        seconds, same rule as #timerNum: a permanent countdown is noise, a late one is
        pressure. */
-    +".chBar{width:min(92vw,420px);height:5px;border-radius:3px;background:rgba(255,255,255,.10);overflow:hidden;}"
-    +".chBar i{display:block;height:100%;width:100%;transform-origin:left center;background:linear-gradient(90deg,#fff,#8ef0bd);"
       +"box-shadow:0 0 12px rgba(95,230,164,.55);transition:transform .1s linear;}"
-    +".chBar.warn i{background:linear-gradient(90deg,#ffb648,#ffd08a);box-shadow:0 0 12px rgba(255,182,72,.6);}"
-    +".chBar.crit i{background:linear-gradient(90deg,#ff5f57,#ff9a94);box-shadow:0 0 14px rgba(255,95,87,.65);}"
-    +".chClock{font-family:var(--display);font-weight:700;font-size:15px;color:var(--mint);min-height:19px;letter-spacing:-.2px;}"
     +".chMark{position:absolute;width:38px;height:38px;margin:-19px 0 0 -19px;border-radius:50%;border:2px solid rgba(255,255,255,.75);pointer-events:none;animation:chPop .45s ease-out forwards;}"
     +".chMark.hit{border-color:var(--mint);box-shadow:0 0 0 6px rgba(95,230,164,.22);}"
     +".chMark.stay{animation:chHold 1.6s ease-in-out infinite;opacity:1;}"
+    /* THE MOMENT THE WHOLE SCREEN EXISTS FOR. Finding it used to be a border turning mint
+       and the card sliding up — the same amount of feedback as a miss, for the one event
+       that is supposed to feel like winning. Three cheap layers, no library, no images:
+       a ring that expands out of the tap point, a flash of the frame, and eight sparks.
+       All pure CSS on elements that remove themselves, so nothing here can leak or block
+       the ending card behind it. */
+    +".chWin{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:hidden;}"
+    +".chRing{position:absolute;width:38px;height:38px;margin:-19px 0 0 -19px;border-radius:50%;"
+    +"border:3px solid var(--mint);animation:chRing .72s cubic-bezier(.2,.7,.3,1) forwards;}"
+    +"@keyframes chRing{0%{transform:scale(1);opacity:.95}100%{transform:scale(9);opacity:0}}"
+    +".chFlash{position:absolute;inset:0;background:radial-gradient(circle at var(--fx) var(--fy),"
+    +"rgba(95,230,164,.45),transparent 60%);animation:chFlash .6s ease-out forwards;}"
+    +"@keyframes chFlash{0%{opacity:1}100%{opacity:0}}"
+    +".chSpark{position:absolute;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;"
+    +"background:var(--mint);animation:chSpark .8s cubic-bezier(.15,.8,.3,1) forwards;}"
+    +"@keyframes chSpark{0%{transform:translate(0,0) scale(1);opacity:1}"
+    +"100%{transform:translate(var(--sx),var(--sy)) scale(.2);opacity:0}}"
     +"@keyframes chHold{0%,100%{transform:scale(1);box-shadow:0 0 0 6px rgba(95,230,164,.22)}50%{transform:scale(1.12);box-shadow:0 0 0 12px rgba(95,230,164,.05)}}"
     +"@keyframes chPop{from{transform:scale(.4);opacity:1}to{transform:scale(1.25);opacity:0}}"
     +"@keyframes chShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}"
@@ -4628,6 +4993,9 @@ function chSeek(){
       +"box-shadow:0 10px 28px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;animation:pwBuyGlow 3s ease-in-out infinite;}"
     +".chCta::after{content:\"\";position:absolute;top:0;left:-60%;width:42%;height:100%;background:linear-gradient(100deg,transparent,rgba(150,255,210,.55),transparent);transform:skewX(-18deg);animation:pwBuySheen 3.6s ease-in-out infinite;pointer-events:none;}"
     +".chCta:active{transform:scale(.98);}"
+    +".chNum{color:var(--mint);font-weight:800;}"
+    +".chNum.warn{color:#ffb648;}"
+    +".chNum.crit{color:#ff5f57;}"
     +".chR{background:none;border:none;color:rgba(255,255,255,.3);font-size:11px;text-decoration:underline;margin-top:2px;font-family:var(--font);}";
   document.head.appendChild(st);
 
@@ -4636,9 +5004,6 @@ function chSeek(){
     +'<h1 class="chHead" id="chHead">Loading…</h1>'
     +'<p class="chSub" id="chSub"></p>'
     +'<div class="chFrame" id="chFrame"></div>'
-    +'<div class="chBar" id="chBar"><i id="chFill"></i></div>'
-    +'<div class="chPips" id="chPips"></div>'
-    +'<div class="chClock" id="chClock"></div>'
     +'<div id="chFoot"></div>';
   document.body.appendChild(w);
   const $$=(id)=>document.getElementById(id);
@@ -4646,11 +5011,36 @@ function chSeek(){
   /* One ending, two readings. Both land on the same card and the same button shape, because
      the ask is identical either way — the only thing that changes is why they should want
      to. Won: reciprocity. Lost: respect for the tool that beat them. */
+  /* Self-removing on purpose: the ending card mounts a moment later, and an effect layer
+     that outlived it would sit over the CTA. 900ms covers the longest of the three. */
+  function chCelebrate(host,x,y){
+    try{
+      if(!host) return;
+      const w=document.createElement("div"); w.className="chWin";
+      const flash=document.createElement("div"); flash.className="chFlash";
+      flash.style.setProperty("--fx",x+"px"); flash.style.setProperty("--fy",y+"px");
+      w.appendChild(flash);
+      const ring=document.createElement("div"); ring.className="chRing";
+      ring.style.left=x+"px"; ring.style.top=y+"px"; w.appendChild(ring);
+      for(let i=0;i<8;i++){
+        const a=(Math.PI*2*i)/8 + Math.random()*0.4, d=70+Math.random()*60;
+        const sp=document.createElement("div"); sp.className="chSpark";
+        sp.style.left=x+"px"; sp.style.top=y+"px";
+        sp.style.setProperty("--sx",Math.round(Math.cos(a)*d)+"px");
+        sp.style.setProperty("--sy",Math.round(Math.sin(a)*d)+"px");
+        sp.style.animationDelay=(Math.random()*0.06).toFixed(3)+"s";
+        w.appendChild(sp);
+      }
+      host.appendChild(w);
+      setTimeout(()=>w.remove(),900);
+      try{ navigator.vibrate && navigator.vibrate([12,40,18]); }catch(_){}
+    }catch(_){}
+  }
+
   function ending(head,sub,label){
     $$("chHead").textContent=head;
     $$("chSub").textContent=sub||"";
-    $$("chPips").innerHTML=""; $$("chClock").textContent="";
-    const bar=$$("chBar"); if(bar) bar.style.display="none";
+
     /* The frame stops growing once the game is over, or on a short phone the card would
        be pushed off the bottom by a photo nobody is playing any more. */
     const fr=$$("chFrame"); if(fr) fr.style.flex="0 1 auto";
@@ -4671,24 +5061,33 @@ function chSeek(){
     img.alt="Find the hidden figure";
     $$("chFrame").appendChild(img);
 
-    $$("chHead").textContent=h.secs?("Someone vanished in "+h.secs+"s"):"Someone is hiding in here";
-    /* The social proof goes ABOVE the game, not under the result. It is the dare — "nine
-       people looked and six walked away" is what makes the first tap feel like something. */
-    const missed=(h.n_attempts||0)-(h.n_found||0);
+    /* ONE INSTRUCTION, NOT A BRAG. "Someone vanished in 1s" told the seeker about the
+       HIDER's round — a number they cannot act on, on the screen where they have to act. */
+    $$("chHead").textContent="Find the body";
     /* THE CLOCK IS DERIVED FROM THE HIDER'S OWN ROUND, which is what finally makes their
        time mean something beyond a brag: a hide that took 14 seconds buys the seeker 28.
        Bounded 20-45 so a one-second test hide still gives a playable round and a slow one
        does not hand out a minute. */
-    const LIMIT=Math.max(20,Math.min(45,(h.secs||10)*2));
-    $$("chSub").textContent = (h.n_attempts && missed)
-      ? (missed+" of "+h.n_attempts+" never found them. You get "+LIMIT+"s.")
-      : ("You get "+LIMIT+"s. Tap when you see them.");
-    /* "1 of 1 never found them" is fine; "1 people" is not. Only the bare count needs the
-       word attached to it. */
-    const pips=$$("chPips");
-    const drawPips=(left)=>{ pips.innerHTML=""; for(let i=0;i<CH_TAPS;i++){ const d=document.createElement("div");
-      d.className="chPip"+(i<left?"":" off"); pips.appendChild(d); } };
-    drawPips(CH_TAPS);
+    /* The hider's choice wins when there is one; otherwise derive it exactly as before.
+       Null is what every hide published before custom limits existed carries, and what the
+       automatic path still stores, so this is the branch almost every round takes. */
+    const LIMIT=h.limit_s||Math.max(20,Math.min(45,(h.secs||10)*2));
+    const TAPS=h.max_taps||CH_TAPS;
+    /* ONE LIVE LINE INSTEAD OF THREE INDICATORS. A progress bar, a row of pips and a
+       countdown all said the same two things, none of them next to the words explaining
+       them, and all three sat below the photo where nobody looks while hunting. The
+       sentence that already states the rules now counts them down in place: the value and
+       its unit are highlighted together, because "18" alone is not information — "18 sec"
+       is. It warms to amber and then to red on the same thresholds the bar used, so the
+       urgency survives the elements that carried it. */
+    const subEl=$$("chSub");
+    const renderSub=(secLeft,tapsLeft)=>{
+      const sec=Math.max(0,Math.ceil(secLeft));
+      const cls=secLeft<=5?" crit":(secLeft<=LIMIT*0.4?" warn":"");
+      subEl.innerHTML='You get <b class="chNum'+cls+'">'+sec+' sec</b> and <b class="chNum">'
+        +tapsLeft+(tapsLeft===1?" tap":" taps")+"</b>.";
+    };
+    renderSub(LIMIT,TAPS);
 
     let t0=0, tries=0, done=false, clock=null;
     img.onclick=async(e)=>{
@@ -4702,13 +5101,10 @@ function chSeek(){
         clock=setInterval(()=>{
           if(done) return;
           const left=LIMIT-(Date.now()-t0)/1000;
-          const bar=$$("chBar"), fill=$$("chFill");
-          if(fill) fill.style.transform="scaleX("+Math.max(0,left/LIMIT)+")";
-          if(bar){ bar.classList.toggle("warn",left<=LIMIT*0.4&&left>5); bar.classList.toggle("crit",left<=5); }
-          $$("chClock").textContent = left<=5 ? Math.max(0,left).toFixed(1)+"s" : "";
+          renderSub(left,TAPS-tries);
           if(left<=0) timeUp();
         },100); }
-      tries++; drawPips(CH_TAPS-tries);
+      tries++; renderSub(t0?LIMIT-(Date.now()-t0)/1000:LIMIT, TAPS-tries);
       const mk=document.createElement("div"); mk.className="chMark";
       mk.style.left=(e.clientX-r.left)+"px"; mk.style.top=(e.clientY-r.top)+"px";
       $$("chFrame").appendChild(mk); mk._t=setTimeout(()=>{ if(!mk.classList.contains("stay")) mk.remove(); },500);
@@ -4721,6 +5117,7 @@ function chSeek(){
            itself; this one is the answer, and clearing it threw away the only moment where
            the player sees what they were looking for. */
         mk.className="chMark hit stay"; clearTimeout(mk._t);
+        chCelebrate($$("chFrame"), (e.clientX-r.left), (e.clientY-r.top));
         track("seek_found",{tries:tries,ms:Date.now()-t0});
         /* MY OWN MISSES ARE NOT OTHER PEOPLE. res.missed is every failed attempt ever
            recorded on this hide, which includes the ones I just made — so a player who
@@ -4736,7 +5133,7 @@ function chSeek(){
       }
       img.classList.remove("chShake"); void img.offsetWidth; img.classList.add("chShake");
       track("seek_miss",{tries:tries});
-      if(tries>=CH_TAPS) timeUp("taps");
+      if(tries>=TAPS) timeUp("taps");
     };
 
     /* ONE LOSS, TWO WAYS IN. Out of taps and out of time end identically — the reveal, then
